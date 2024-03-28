@@ -61,4 +61,33 @@ routes.get("/contact/:id", async (req, res) => {
   }
 });
 
+//serch method
+
+routes.get("/contacts/search", async (req, res) => {
+  try {
+    const serchTerm = req.query.serchTerm;
+    const serchRegex = RegExp(serchTerm, "i");
+
+    await contact
+      .find({
+        $or: [
+          { firstName: serchRegex },
+          { lastName: serchRegex },
+          { email: serchRegex },
+        ],
+      })
+      .then((contacts) => {
+        console.log(contacts);
+        res.status(200).json({ contact: contacts });
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({ msg: "Unable to find the contact" });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "No contact found" });
+  }
+});
+
 module.exports = routes;
